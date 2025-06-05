@@ -1,20 +1,20 @@
 <?php
-// 引入 aws.phar（必须提前放在 wordpress 根目录下）
+// Import aws.phar
 require __DIR__ . '/aws.phar';
 
-// 使用 mysqli 并启用 SSL
-define('DB_CLIENT_FLAGS', MYSQLI_CLIENT_SSL);
+// Using mysqli with SSL enabled
+define('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL);
 
 use Aws\SecretsManager\SecretsManagerClient;
 use Aws\Exception\AwsException;
 
-// 初始化 Secrets Manager 客户端
+// Initialize the Secrets Manager client
 $client = new SecretsManagerClient([
     'version' => 'latest',
     'region'  => 'ap-southeast-2'
 ]);
 
-// 获取 secret 并解析 JSON 内容
+// Get the secret and parse the JSON content
 $result = $client->getSecretValue([
     'SecretId' => 'rds/wordpress',
 ]);
@@ -22,7 +22,7 @@ $result = $client->getSecretValue([
 $secret = $result['SecretString'];
 $data = json_decode($secret, true);
 
-// 设置 WordPress 数据库常量
+// Setting WordPress database constants
 define('DB_NAME',     $data['db_name']);
 define('DB_USER',     $data['username']);
 define('DB_PASSWORD', $data['password']);
@@ -32,10 +32,10 @@ define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');
 $table_prefix = 'wp_';
 
-// Debug 设置
+// Debug Settings
 define('WP_DEBUG', false);
 
-// 绝对路径定义
+// Absolute path definition
 if (!defined('ABSPATH')) {
     define('ABSPATH', __DIR__ . '/');
 }
